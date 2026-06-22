@@ -61,6 +61,9 @@ export function useCurveAnimation({ totalPoints }: UseCurveAnimationProps) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsPlaying(true);
       setDrawnPointCount(0);
+    } else if (totalPoints > 0 && !isPlaying) {
+      // Reset when a new curve is generated and autoPlay is off
+      setDrawnPointCount(0);
     }
   }, [autoPlay, totalPoints]);
 

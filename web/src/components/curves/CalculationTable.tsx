@@ -33,7 +33,7 @@ export default function CalculationTable({ paramName, highResSteps, lowResSteps,
   const paginatedSteps = filteredSteps.slice(page * rowsPerPage, (page + 1) * rowsPerPage);
 
   const handleExportCSV = () => {
-    const header = `No,${paramName},Rumus X,Hasil X,Rumus Y,Hasil Y\n`;
+    const header = `No,${paramName},Rumus X,Nilai X,Rumus Y,Nilai Y\n`;
     const rows = currentSteps.map(s => 
       `${s.no},${s.paramValue},"${s.xFormula}",${s.xResult},"${s.yFormula}",${s.yResult}`
     ).join('\n');
@@ -114,9 +114,9 @@ export default function CalculationTable({ paramName, highResSteps, lowResSteps,
               <th className="px-4 py-3 font-semibold w-12">No</th>
               <th className="px-4 py-3 font-semibold w-24">{paramName}</th>
               <th className="px-4 py-3 font-semibold min-w-[200px]">Rumus X</th>
-              <th className="px-4 py-3 font-semibold w-28 text-primary">Hasil X</th>
+              <th className="px-4 py-3 font-semibold w-28 text-primary">Nilai X</th>
               <th className="px-4 py-3 font-semibold min-w-[200px]">Rumus Y</th>
-              <th className="px-4 py-3 font-semibold w-28 text-primary">Hasil Y</th>
+              <th className="px-4 py-3 font-semibold w-28 text-primary">Nilai Y</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">

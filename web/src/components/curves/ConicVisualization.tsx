@@ -183,12 +183,14 @@ export default function ConicVisualization({
     }
     if (options.showFocus && geometricInfo.foci) {
       geometricInfo.foci.forEach((f, i) => {
-        ips.push({ point: f, label: `F${geometricInfo.foci!.length > 1 ? i+1 : ''} (${formatCoord(f.x)}, ${formatCoord(f.y)})`, color: '#10B981', type: 'focus' }); // Green
+        const prefix = geometricInfo.foci!.length > 1 ? `F${i+1}` : 'FOCUS';
+        ips.push({ point: f, label: `${prefix} (${formatCoord(f.x)}, ${formatCoord(f.y)})`, color: '#10B981', type: 'focus' }); // Green
       });
     }
     if (options.showVertex && geometricInfo.vertices) {
       geometricInfo.vertices.forEach((v, i) => {
-        ips.push({ point: v, label: `V${geometricInfo.vertices!.length > 1 ? i+1 : ''} (${formatCoord(v.x)}, ${formatCoord(v.y)})`, color: '#EF4444', type: 'vertex' }); // Red
+        const prefix = geometricInfo.vertices!.length > 1 ? `V${i+1}` : 'VERTEX';
+        ips.push({ point: v, label: `${prefix} (${formatCoord(v.x)}, ${formatCoord(v.y)})`, color: '#EF4444', type: 'vertex' }); // Red
       });
     }
     if (options.showVertex && geometricInfo.majorVertices && geometricInfo.majorVertices.length > 0) {
@@ -236,9 +238,9 @@ export default function ConicVisualization({
     }
     return (
       <g className="directrix-group">
-        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#EC4899" strokeWidth={1.5 / scale} className="directrix-line" />
-        <text x={labelX} y={labelY} fill="#EC4899" fontSize={11 / scale} fontWeight="bold" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
-          Directrix {axis}={formatCoord(value)}
+        <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#9333EA" strokeWidth={1.5 / scale} className="directrix-line" />
+        <text x={labelX} y={labelY} fill="#9333EA" fontSize={11 / scale} fontWeight="bold" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+          DIRECTRIX {axis}={formatCoord(value)}
         </text>
       </g>
     );
@@ -251,7 +253,7 @@ export default function ConicVisualization({
       const yAtXmax = line.slope * (xMax - line.centerX) + line.centerY;
       const pt1 = toSVG({ x: xMin, y: yAtXmin }, xMin, xMax, yMin, yMax);
       const pt2 = toSVG({ x: xMax, y: yAtXmax }, xMin, xMax, yMin, yMax);
-      return <line key={i} x1={pt1.sx} y1={pt1.sy} x2={pt2.sx} y2={pt2.sy} stroke="#A855F7" strokeWidth={1.5 / scale} className="asymptote-line" />;
+      return <line key={i} x1={pt1.sx} y1={pt1.sy} x2={pt2.sx} y2={pt2.sy} stroke="#A855F7" strokeWidth={1.5 / scale} strokeDasharray="4 4" className="asymptote-line" />;
     });
   }, [geometricInfo, options.showAsymptotes, xMin, xMax, yMin, yMax, scale]);
 
@@ -387,20 +389,21 @@ export default function ConicVisualization({
                 const { sx, sy } = toSVG(p, xMin, xMax, yMin, yMax);
                 const isHovered = hoveredIndex === i;
                 return (
-                  <circle 
-                    key={`sample-${i}`} 
-                    cx={sx} 
-                    cy={sy} 
-                    r={(isHovered ? 5 : 3) / scale} 
-                    fill={isHovered ? '#ffffff' : '#f8fafc'} 
-                    opacity={isHovered ? 1 : 0.9}
-                    stroke={curveColor}
-                    strokeWidth={1.5 / scale}
-                    onMouseEnter={() => setLocalHoveredIndex(i)}
-                    onMouseLeave={() => setLocalHoveredIndex(null)}
-                    onClick={() => onPointClick && onPointClick(i)}
-                    className="cursor-pointer transition-all duration-200"
-                  />
+                  <g key={`sample-${i}`}>
+                    <circle 
+                      cx={sx} 
+                      cy={sy} 
+                      r={(isHovered ? 5 : 3) / scale} 
+                      fill={isHovered ? '#ffffff' : '#f8fafc'} 
+                      opacity={isHovered ? 1 : 0.9}
+                      stroke={curveColor}
+                      strokeWidth={1.5 / scale}
+                      onMouseEnter={() => setLocalHoveredIndex(i)}
+                      onMouseLeave={() => setLocalHoveredIndex(null)}
+                      onClick={() => onPointClick && onPointClick(i)}
+                      className="cursor-pointer transition-all duration-200"
+                    />
+                  </g>
                 );
               })}
 
@@ -410,20 +413,21 @@ export default function ConicVisualization({
                 const { sx, sy } = toSVG(p, xMin, xMax, yMin, yMax);
                 const isHovered = hoveredIndex === i;
                 return (
-                  <circle 
-                    key={`sample-sec-${i}`} 
-                    cx={sx} 
-                    cy={sy} 
-                    r={(isHovered ? 5 : 3) / scale} 
-                    fill={isHovered ? '#ffffff' : '#f8fafc'} 
-                    opacity={isHovered ? 1 : 0.9}
-                    stroke={secondaryCurveColor}
-                    strokeWidth={1.5 / scale}
-                    onMouseEnter={() => setLocalHoveredIndex(i)}
-                    onMouseLeave={() => setLocalHoveredIndex(null)}
-                    onClick={() => onPointClick && onPointClick(i)}
-                    className="cursor-pointer transition-all duration-200"
-                  />
+                  <g key={`sample-sec-${i}`}>
+                    <circle 
+                      cx={sx} 
+                      cy={sy} 
+                      r={(isHovered ? 5 : 3) / scale} 
+                      fill={isHovered ? '#ffffff' : '#f8fafc'} 
+                      opacity={isHovered ? 1 : 0.9}
+                      stroke={secondaryCurveColor}
+                      strokeWidth={1.5 / scale}
+                      onMouseEnter={() => setLocalHoveredIndex(i)}
+                      onMouseLeave={() => setLocalHoveredIndex(null)}
+                      onClick={() => onPointClick && onPointClick(i)}
+                      className="cursor-pointer transition-all duration-200"
+                    />
+                  </g>
                 );
               })}
             </g>
@@ -503,11 +507,11 @@ export default function ConicVisualization({
                 Titik Iterasi #{hoveredStep.no}
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm font-mono">
-                <span className="text-muted">Param t:</span>
-                <span className="text-primary text-right">{hoveredStep.paramValue.toFixed(4)}</span>
-                <span className="text-muted">Koordinat x:</span>
+                <span className="text-muted">{curveType === 'circle' || curveType === 'ellipse' ? 'Parameter θ:' : 'Param t:'}</span>
+                <span className="text-primary text-right">{curveType === 'circle' || curveType === 'ellipse' ? `${hoveredStep.paramValue}°` : hoveredStep.paramValue.toFixed(4)}</span>
+                <span className="text-muted">Koordinat X:</span>
                 <span className="text-foreground text-right">{hoveredStep.xResult.toFixed(4)}</span>
-                <span className="text-muted">Koordinat y:</span>
+                <span className="text-muted">Koordinat Y:</span>
                 <span className="text-foreground text-right">{hoveredStep.yResult.toFixed(4)}</span>
               </div>
             </motion.div>

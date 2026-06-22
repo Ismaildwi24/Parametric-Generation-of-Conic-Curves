@@ -206,13 +206,12 @@ export default function HiperbolaPage() {
 
       {isGenerated && highResData && lowResData && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 mt-6">
-          <FormulaDisplay
-            title="Persamaan Parametrik"
-            formulas={[
-              { label: 'x(θ)', equation: `x = ${centerX} + ${a} · sec(θ)` },
-              { label: 'y(θ)', equation: `y = ${centerY} + ${b} · tan(θ)` },
-            ]}
-            parameterRange="θ ∈ (-π/2, π/2) ∪ (π/2, 3π/2)"
+          <CurveSummaryCard
+            curveType="Hiperbola"
+            info={highResData.info}
+            pointCount={totalPoints}
+            resolution="High"
+            eccentricity={Math.sqrt(Number(a)*Number(a) + Number(b)*Number(b)) / Number(a)}
           />
 
           <EndpointInfo firstStep={highResData.steps[0]} lastStep={highResData.steps[highResData.steps.length - 1]} paramName="θ" />
@@ -244,45 +243,40 @@ export default function HiperbolaPage() {
           
           <ExportControls paramName="θ" steps={highResData.steps} curveName="Hiperbola" />
 
-          {/* NEW SECTION – MATHEMATICAL ANALYSIS */}
-          <div className="mt-12 pt-8 border-t border-border/50">
-            <h2 className="text-2xl font-bold text-foreground mb-6 uppercase tracking-wider flex items-center gap-3">
-              <span className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary text-sm font-black">M</span>
-              Analisis Matematis Kurva
-            </h2>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Summary & Verification */}
-              <div className="lg:col-span-4 flex flex-col gap-6">
-                <CurveSummaryCard
-                  curveType="Hiperbola"
-                  info={highResData.info}
-                  pointCount={totalPoints}
-                  resolution="High"
-                  eccentricity={Math.sqrt(Number(a)*Number(a) + Number(b)*Number(b)) / Number(a)}
-                />
-                
-                <EducationalVerification
-                  items={[
-                    { label: 'Fokus dikalkulasi', isVerified: !!(highResData.info.foci && highResData.info.foci.length > 0) },
-                    { label: 'Eksentrisitas dihitung', isVerified: true },
-                    { label: 'Syarat e > 1 divalidasi', isVerified: true },
-                    { label: 'Asimtot dikalkulasi', isVerified: !!(highResData.info.asymptoteLines && highResData.info.asymptoteLines.length > 0) }
-                  ]}
-                />
-              </div>
-
-              {/* Right Column: Theory & Derivation */}
-              <div className="lg:col-span-8 flex flex-col gap-6">
-                <TheoryExplanation curveType="hyperbola" />
-                
-                <MathematicalDerivation
-                  curveType="hyperbola"
-                  params={{ a, b, centerX, centerY }}
-                />
-              </div>
+          <details className="group glass p-6 rounded-xl border border-border/50 [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex items-center justify-between cursor-pointer list-none">
+              <h2 className="text-xl font-bold text-foreground uppercase tracking-wider flex items-center gap-3">
+                <span className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary text-sm font-black">M</span>
+                Teori Matematis & Analisis
+              </h2>
+              <span className="transition group-open:rotate-180">
+                <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+              </span>
+            </summary>
+            <div className="mt-6 pt-6 border-t border-border/50 flex flex-col gap-6">
+              <FormulaDisplay
+                title="Persamaan Parametrik"
+                formulas={[
+                  { label: 'x(θ)', equation: `x = ${centerX} + ${a} · sec(θ)` },
+                  { label: 'y(θ)', equation: `y = ${centerY} + ${b} · tan(θ)` },
+                ]}
+                parameterRange="θ ∈ (-π/2, π/2) ∪ (π/2, 3π/2)"
+              />
+              <EducationalVerification
+                items={[
+                  { label: 'Fokus dikalkulasi', isVerified: !!(highResData.info.foci && highResData.info.foci.length > 0) },
+                  { label: 'Eksentrisitas dihitung', isVerified: true },
+                  { label: 'Syarat e > 1 divalidasi', isVerified: true },
+                  { label: 'Asimtot dikalkulasi', isVerified: !!(highResData.info.asymptoteLines && highResData.info.asymptoteLines.length > 0) }
+                ]}
+              />
+              <TheoryExplanation curveType="hyperbola" />
+              <MathematicalDerivation
+                curveType="hyperbola"
+                params={{ a, b, centerX, centerY }}
+              />
             </div>
-          </div>
+          </details>
         </motion.div>
       )}
     </CurvePageLayout>

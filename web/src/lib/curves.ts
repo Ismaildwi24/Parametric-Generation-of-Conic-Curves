@@ -31,17 +31,18 @@ export function generateCircle(
   const twoPI = 2 * Math.PI;
 
   let no = 1;
-  for (let theta = 0; theta <= twoPI + 1e-9; theta += stepDelta) {
-    const x = formatNum(centerX + radius * Math.cos(theta));
-    const y = formatNum(centerY + radius * Math.sin(theta));
+  for (let theta = 0; theta <= 360 + 1e-9; theta += stepDelta) {
+    const rad = (theta * Math.PI) / 180;
+    const x = formatNum(centerX + radius * Math.cos(rad));
+    const y = formatNum(centerY + radius * Math.sin(rad));
     
     points.push({ x, y });
     steps.push({
       no: no++,
       paramValue: formatNum(theta),
-      xFormula: `x = ${centerX} + ${radius} × cos(${formatNum(theta)})`,
+      xFormula: `x = ${centerX} + ${radius} × cos(${formatNum(theta)}°)`,
       xResult: x,
-      yFormula: `y = ${centerY} + ${radius} × sin(${formatNum(theta)})`,
+      yFormula: `y = ${centerY} + ${radius} × sin(${formatNum(theta)}°)`,
       yResult: y,
     });
   }
@@ -68,17 +69,18 @@ export function generateEllipse(
   const twoPI = 2 * Math.PI;
 
   let no = 1;
-  for (let theta = 0; theta <= twoPI + 1e-9; theta += stepDelta) {
-    const x = formatNum(centerX + a * Math.cos(theta));
-    const y = formatNum(centerY + b * Math.sin(theta));
+  for (let theta = 0; theta <= 360 + 1e-9; theta += stepDelta) {
+    const rad = (theta * Math.PI) / 180;
+    const x = formatNum(centerX + a * Math.cos(rad));
+    const y = formatNum(centerY + b * Math.sin(rad));
     
     points.push({ x, y });
     steps.push({
       no: no++,
       paramValue: formatNum(theta),
-      xFormula: `x = ${centerX} + ${a} × cos(${formatNum(theta)})`,
+      xFormula: `x = ${centerX} + ${a} × cos(${formatNum(theta)}°)`,
       xResult: x,
-      yFormula: `y = ${centerY} + ${b} × sin(${formatNum(theta)})`,
+      yFormula: `y = ${centerY} + ${b} × sin(${formatNum(theta)}°)`,
       yResult: y,
     });
   }

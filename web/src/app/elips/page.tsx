@@ -78,6 +78,10 @@ export default function ElipsPage() {
       alert('Sumbu mayor dan minor harus lebih besar dari 0.');
       return;
     }
+    if (a === b) {
+      alert('Sumbu mayor dan minor tidak boleh sama untuk Elips (jika sama, itu adalah Lingkaran).');
+      return;
+    }
     setIsGenerated(true);
     setSelectedPointIndex(null);
   };
@@ -121,8 +125,8 @@ export default function ElipsPage() {
             <SliderControl label="Center X (xc)" value={centerX} min={-5} max={5} step={0.5} onChange={setCenterX} />
             <SliderControl label="Center Y (yc)" value={centerY} min={-5} max={5} step={0.5} onChange={setCenterY} />
             <div className="h-px bg-border my-4" />
-            <SliderControl label="Delta θ Besar (Res. Rendah)" value={deltaThetaLow} min={0.1} max={2} step={0.1} unit="rad" onChange={setDeltaThetaLow} />
-            <SliderControl label="Delta θ Kecil (Res. Tinggi)" value={deltaThetaHigh} min={0.01} max={0.5} step={0.01} unit="rad" onChange={setDeltaThetaHigh} />
+            <SliderControl label="Delta θ Besar (Res. Rendah)" value={deltaThetaLow} min={5} max={90} step={5} unit="°" onChange={setDeltaThetaLow} />
+            <SliderControl label="Delta θ Kecil (Res. Tinggi)" value={deltaThetaHigh} min={1} max={10} step={1} unit="°" onChange={setDeltaThetaHigh} />
             
             <div className="flex gap-2 pt-4 border-t border-border mt-4">
               <button onClick={handleGenerate} className="flex-1 bg-primary text-primary-foreground py-2 rounded font-medium flex items-center justify-center gap-2 hover:bg-primary/90 transition shadow-[0_0_15px_rgba(56,189,248,0.2)]">
@@ -204,20 +208,23 @@ export default function ElipsPage() {
 
       {isGenerated && highResData && lowResData && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 mt-6">
-          <FormulaDisplay
-            title="Persamaan Parametrik"
-            formulas={[
-              { label: 'x(θ)', equation: `x = ${centerX} + ${a} · cos(θ)` },
-              { label: 'y(θ)', equation: `y = ${centerY} + ${b} · sin(θ)` },
-            ]}
-            parameterRange="θ ∈ [0, 2π]"
+          <CurveSummaryCard
+            curveType="Elips"
+            info={highResData.info}
+            pointCount={totalPoints}
+            resolution="High"
+            eccentricity={
+              Number(a) >= Number(b) 
+                ? Math.sqrt(Math.max(0, Number(a)*Number(a) - Number(b)*Number(b))) / Number(a)
+                : Math.sqrt(Math.max(0, Number(b)*Number(b) - Number(a)*Number(a))) / Number(b)
+            }
           />
 
           <EndpointInfo firstStep={highResData.steps[0]} lastStep={highResData.steps[highResData.steps.length - 1]} paramName="θ" />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <CurveInfo info={highResData.info} pointCount={totalPoints} />
-            <IterationPanel paramName="θ" paramRange="[0, 2π]" delta={deltaThetaHigh as number} totalIterations={totalPoints} values={highResData.steps.map(s => s.paramValue)} />
+            <IterationPanel paramName="θ" paramRange="[0°, 360°]" delta={deltaThetaHigh as number} totalIterations={totalPoints} values={highResData.steps.map(s => s.paramValue)} />
             <PointDetailPanel step={selectedPointIndex !== null ? highResData.steps[selectedPointIndex] : null} paramName="θ" />
           </div>
 
@@ -233,48 +240,39 @@ export default function ElipsPage() {
           
           <ExportControls paramName="θ" steps={highResData.steps} curveName="Elips" />
 
-          {/* NEW SECTION – MATHEMATICAL ANALYSIS */}
-          <div className="mt-12 pt-8 border-t border-border/50">
-            <h2 className="text-2xl font-bold text-foreground mb-6 uppercase tracking-wider flex items-center gap-3">
-              <span className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary text-sm font-black">M</span>
-              Analisis Matematis Kurva
-            </h2>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Summary & Verification */}
-              <div className="lg:col-span-4 flex flex-col gap-6">
-                <CurveSummaryCard
-                  curveType="Elips"
-                  info={highResData.info}
-                  pointCount={totalPoints}
-                  resolution="High"
-                  eccentricity={
-                    Number(a) >= Number(b) 
-                      ? Math.sqrt(Math.max(0, Number(a)*Number(a) - Number(b)*Number(b))) / Number(a)
-                      : Math.sqrt(Math.max(0, Number(b)*Number(b) - Number(a)*Number(a))) / Number(b)
-                  }
-                />
-                
-                <EducationalVerification
-                  items={[
-                    { label: 'Fokus dikalkulasi', isVerified: !!(highResData.info.foci && highResData.info.foci.length > 0) },
-                    { label: 'Eksentrisitas dihitung', isVerified: true },
-                    { label: 'Syarat 0 < e < 1 divalidasi', isVerified: true }
-                  ]}
-                />
-              </div>
-
-              {/* Right Column: Theory & Derivation */}
-              <div className="lg:col-span-8 flex flex-col gap-6">
-                <TheoryExplanation curveType="ellipse" />
-                
-                <MathematicalDerivation
-                  curveType="ellipse"
-                  params={{ a, b, centerX, centerY }}
-                />
-              </div>
+          <details className="group glass p-6 rounded-xl border border-border/50 [&_summary::-webkit-details-marker]:hidden">
+            <summary className="flex items-center justify-between cursor-pointer list-none">
+              <h2 className="text-xl font-bold text-foreground uppercase tracking-wider flex items-center gap-3">
+                <span className="w-8 h-8 rounded bg-primary/20 flex items-center justify-center text-primary text-sm font-black">M</span>
+                Teori Matematis & Analisis
+              </h2>
+              <span className="transition group-open:rotate-180">
+                <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+              </span>
+            </summary>
+            <div className="mt-6 pt-6 border-t border-border/50 flex flex-col gap-6">
+              <FormulaDisplay
+                title="Persamaan Parametrik"
+                formulas={[
+                  { label: 'x(θ)', equation: `x = ${centerX} + ${a} · cos(θ)` },
+                  { label: 'y(θ)', equation: `y = ${centerY} + ${b} · sin(θ)` },
+                ]}
+                parameterRange="θ ∈ [0°, 360°]"
+              />
+              <EducationalVerification
+                items={[
+                  { label: 'Fokus dikalkulasi', isVerified: !!(highResData.info.foci && highResData.info.foci.length > 0) },
+                  { label: 'Eksentrisitas dihitung', isVerified: true },
+                  { label: 'Syarat 0 < e < 1 divalidasi', isVerified: true }
+                ]}
+              />
+              <TheoryExplanation curveType="ellipse" />
+              <MathematicalDerivation
+                curveType="ellipse"
+                params={{ a, b, centerX, centerY }}
+              />
             </div>
-          </div>
+          </details>
         </motion.div>
       )}
     </CurvePageLayout>
